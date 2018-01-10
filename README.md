@@ -4,12 +4,12 @@ A quick utility to do some simple statistical analysis on a binary string. Curre
 
 ## Normal Curve
 Example:
-`python binstr_analyzer.py normcurve [-p 0.5 -c 1.96] 01010101'
+`python binstr_analyzer.py normcurve [-p 0.5 -c 1.96] 01010101`
 
 ## Approximate Entropy
 Example:
-`python binstr_analyzer.py apen [-k 1] 01010101'
+`python binstr_analyzer.py apen [-k 1] 01010101`
 
 ## All
 Example:
-`python binstr_analyzer.py all [-p 0.5 -c 1.96 -k 1] 01010101'
+`python binstr_analyzer.py all [-p 0.5 -c 1.96 -k 1] 01010101`
