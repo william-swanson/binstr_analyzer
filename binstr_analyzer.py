@@ -2,33 +2,37 @@ import argparse
 import math
 import itertools
 import regex #NEW LIBRARY, HAD TO INSTALL
+import sys
 
 def __init__():
-    parser = argparse.ArgumentParser(description="determine if a binary string is random")
-    parser.add_argument('string',type=str,help="the binary string to analyze")
+    parser = argparse.ArgumentParser(description="Command line utility to help determine if a binary string is normal.")
+    parser.add_argument('test',type=str,help="What statistical test do you want to run on the binary string?\nOptions: normcurve, apen, all")
+    parser.add_argument('string',type=str,help="The binary string to analyze.")
 
-    parser.add_argument('-c',type=float,default=1.96,help="the distance from the origin on the normal curve")
-    parser.add_argument('-p',type=float,default=0.5,help="the probability for a 1")
-    parser.add_argument('-k',type=int,default=1,help="length of substring for approximate entropy, ApEn(k)")
+    parser.add_argument('-c',type=float,default=1.96,help="The distance from the origin on the normal curve (default: two standard deviations).")
+    parser.add_argument('-p',type=float,default=0.5,help="The probability for a 1 in the string.")
+
+    parser.add_argument('-k',type=int,default=1,help="Length of substring for approximate entropy, i.e. ApEn(k).")
 
     args = parser.parse_args()
 
-    print(args.string)
-    print(args.c)
-    print(args.p)
-    interval = (calc_interval(args.p,len(args.string),args.c))
-    sampleavg = (calc_sampleavg(args.string.count('1'),len(args.string)))
-
-    print("the interval is (%f,%f)." %(interval[0],interval[1]))
-    print("the sample average is %f." %sampleavg);
-
-    if sampleavg >= interval[0] and sampleavg <= interval[1]:
-        print("not reject")
+    if args.test.lower() == "normcurve":
+        normcurve(args.string,args.c,args.p)
+    elif args.test.lower() == "apen":
+        apen(args.string,args.k)
+    elif args.test.lower() == "all":
+        normcurve(args.string,args.c,args.p)
+        print("".join(["-" for i in range(50)]))
+        apen(args.string,args.k)
     else:
-        print("reject")
+        print("Unknown test parameter. Aborting.")
+        sys.exit(0)
 
-    print calc_approx_entropy(args.string,1)
-    print calc_approx_entropy(args.string,2)
+def apen(binstr, k):
+    print("APPROXIMATE ENTROPY ANALYSIS")
+    print("Binary String: %s" %binstr)
+    print("K: %d\n" %k)
+    print("Approximate Entropy (k=%d): %f" %(k,calc_approx_entropy(binstr,k)))
 
 def calc_interval(p, n, c):
     lower_bound = (p - c*math.sqrt((p*(1-p))/float(n)))
@@ -62,10 +66,22 @@ def calc_H(bin_string, k):
             continue
         h_value -= p*math.log(p,2)
     return h_value
-    #bin_kstrs = ["".join(seq) for seq in itertools.product("01", repeat=k)]
 
+def normcurve(binstr,c,p):
+    print("NORMAL CURVE ANALYSIS")
+    print("Binary String: %s" %binstr)
+    print("C: %f" %c)
+    print("P: %f\n" %p)
 
+    interval = (calc_interval(p,len(binstr),c))
+    sampleavg = (calc_sampleavg(binstr.count('1'),len(binstr)))
+    print("the interval is (%f,%f)." %(interval[0],interval[1]))
+    print("the sample average is %f." %sampleavg)
 
+    if sampleavg >= interval[0] and sampleavg <= interval[1]:
+        print("Not reject")
+    else:
+        print("Reject")
 
 if __name__ == '__main__':
     __init__()
