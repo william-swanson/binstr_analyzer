@@ -21,49 +21,44 @@ def __init__():
 
     args = parser.parse_args()
 
-    k = a = b = -1
-    #TODO: should do some error checking to make sure there is no other garbage in the string/if there are extra :
-    if ":" in args.k:
-        a,b = args.k.split(":")
-        a = int(a)
-        b = int(b)
-    else:
-        k = int(args.k)
-
     if args.test.lower() == "normcurve":
         normcurve(args.string,args.c,args.p)
     elif args.test.lower() == "apen":
-        en_vals = []
-        print("APPROXIMATE ENTROPY ANALYSIS")
-        if k == -1:
-            for i in range(a,b+1,1):
-                approx_ent = calc_approx_entropy(args.string,i)
-                print("Approximate Entropy (k=%d): %f" %(i,approx_ent))
-                en_vals.append(approx_ent)
-        else:
-            approx_ent = calc_approx_entropy(args.string,k)
-            print("Approximate Entropy (k=%d): %f" %(k,approx_ent))
-            en_vals.append(approx_ent)
-
-        if args.show_plt == True:
-            plt.plot(range(1,len(en_vals)+1,1),en_vals,'ro')
-            plt.show()
-
+        apen(args.string,args.k,args.show_plt)
     elif args.test.lower() == "all":
         normcurve(args.string,args.c,args.p)
         print("".join(["-" for i in range(50)]))
-        apen(args.string,args.k)
+        apen(args.string,args.k,args.show_plt)
     else:
         print("Unknown test parameter. Aborting.")
         sys.exit(0)
 
-def apen(binstr, k):
+def apen(binstr, kval, show_plt):
+
+    k = a = b = -1
+    #TODO: should do some error checking to make sure there is no other garbage in the string/if there are extra :
+    if ":" in kval:
+        a,b = kval.split(":")
+        a = int(a)
+        b = int(b)
+    else:
+        k = int(kval)
+
+    en_vals = []
     print("APPROXIMATE ENTROPY ANALYSIS")
-    #print("Binary String: %s" %binstr)
-    #print("K: %d\n" %k)
-    approx_ent = calc_approx_entropy(binstr,k)
-    print("Approximate Entropy (k=%d): %f" %(k,approx_ent))
-    return approx_ent
+    if k == -1:
+        for i in range(a,b+1,1):
+            approx_ent = calc_approx_entropy(binstr,i)
+            print("Approximate Entropy (k=%d): %f" %(i,approx_ent))
+            en_vals.append(approx_ent)
+    else:
+        approx_ent = calc_approx_entropy(binstr,k)
+        print("Approximate Entropy (k=%d): %f" %(k,approx_ent))
+        en_vals.append(approx_ent)
+
+    if show_plt == True:
+        plt.plot(range(1,len(en_vals)+1,1),en_vals,'ro')
+        plt.show()
 
 def calc_interval(p, n, c):
     lower_bound = (p - c*math.sqrt((p*(1-p))/float(n)))
